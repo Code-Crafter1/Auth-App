@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 // app.use(cors());
 corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: [process.env.FRONTEND_URL, "http://localhost:5173"], // Allow both production and development URLs
   credentials: true, // Allow cookies to be sent
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
