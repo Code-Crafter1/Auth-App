@@ -9,7 +9,14 @@ const app = express();
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
+corsOptions = {
+  origin: process.env.FRONTEND_URL,
+  credentials: true, // Allow cookies to be sent
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
 
 // ✅ GLOBAL RESPONSE MIDDLEWARE (IMPORTANT)
 app.use((req, res, next) => {
