@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import API from "../services/api";
+import { useNavigate } from "react-router-dom";
+// import API from "../services/api";
 import { toast } from "react-toastify";
+import { loginUser } from "../services/api";
 
 export default function Login() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     email: "",
@@ -18,13 +19,14 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await API.post("/login", form);
+      // const res = await API.post("/login", form);
+      const res = await loginUser(form);
 
       localStorage.setItem("token", res.data.data.token);
 
       toast.success(res.data.message);
 
-      navigate("/dashboard"); 
+      navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Error");
     }
@@ -33,13 +35,11 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-900 px-4">
       <div className="bg-yellow-200 w-full max-w-sm p-8 rounded-2xl shadow-xl">
-        
         <h2 className="text-2xl font-bold text-center text-green-900 mb-8">
           Login Now
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          
           <input
             id="email"
             name="email"

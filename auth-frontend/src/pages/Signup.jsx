@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import API from "../services/api";
+// import API from "../services/api";
+import { signupUser } from "../services/api";
 import { toast } from "react-toastify";
 
 export default function Signup() {
@@ -14,30 +15,14 @@ export default function Signup() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  //   const handleSubmit = async (e) => {
-  //     e.preventDefault();
 
-  //     try {
-  //       const res = await API.post("/signup", form);
-  //       alert(res.data.message);
-  //       window.location.href = "/verify-otp";
-
-  //       // clear form after success
-  //       setForm({
-  //         name: "",
-  //         email: "",
-  //         password: "",
-  //       });
-  //     } catch (err) {
-  //       alert(err.response?.data?.message || "Error");
-  //     }
-  //   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await API.post("/signup", form);
+      // const res = await API.post("/signup", form);
+      const res = await signupUser(form);
 
       toast.success(res.data.message);
 
@@ -115,7 +100,7 @@ export default function Signup() {
             Already have an account?
             <span
               className="cursor-pointer font-semibold ml-1"
-              onClick={() => (window.location.href = "/login")}
+              onClick={() => navigate("/login")}
             >
               Login
             </span>
