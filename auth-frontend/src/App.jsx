@@ -8,13 +8,16 @@ import VerifyOtp from "./pages/VerifyOtp";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Signup />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/verify-otp" element={<VerifyOtp />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+    <>
+      <Routes>
+        <Route path="/" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <ToastContainer position="top-right" autoClose={2000} theme="colored" />
+      </Routes>
       <ToastContainer position="top-right" autoClose={2000} theme="colored" />
-    </Routes>
+    </>
   );
 }
 
