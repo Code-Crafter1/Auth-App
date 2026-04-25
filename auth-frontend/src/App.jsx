@@ -15,7 +15,7 @@ function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
-      <ToastContainer position="top-right" autoClose={5000} theme="colored" />
+      <ToastContainer position="top-right" autoClose={5000} theme="light" />
     </>
   );
 }
