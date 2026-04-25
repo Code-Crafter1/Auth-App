@@ -123,43 +123,66 @@ exports.verifyOtp = async (req, res) => {
 //     });
 //     //restrict multiple logins
 //     await Session.deleteMany({ userId: user._id });
-const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-  expiresIn: "7d",
-});
 
-// ✅ delete old sessions
-await Session.deleteMany({ userId: user._id });
+//     // ✅ create session
+//     await Session.create({
+//       userId: user._id,
+//       token,
+//       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+//     });
 
-// ✅ create new session
-await Session.create({
-  userId: user._id,
-  token,
-  expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
-});
+//     // res.success("Login successful", { token });
+//     res.cookie("token", token, {
+//       httpOnly: true, // 🔥 can't access via JS
+//       secure: false, // true in production (HTTPS)
+//       sameSite: "strict",
+//       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+//     });
 
-// ✅ SET COOKIE
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: false, // true in production (HTTPS)
-  sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+//     res.success("Login successful");
+//   } catch (err) {
+//     res.error(err.message || "Server error", 500);
+//   }
+// };
 
-res.success("Login successful");
+// ✅ LOGIN
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-    // ✅ create session
+    const emailLower = email.toLowerCase();
+
+    const user = await User.findOne({ email: emailLower });
+
+    if (!user) return res.error("User not found", 400);
+
+    if (!user.isVerified) return res.error("Verify email first", 400);
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) return res.error("Wrong password", 400);
+
+    // ✅ generate token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // ✅ delete old sessions
+    await Session.deleteMany({ userId: user._id });
+
+    // ✅ create new session
     await Session.create({
       userId: user._id,
       token,
-      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     });
 
-    // res.success("Login successful", { token });
+    // ✅ set cookie
     res.cookie("token", token, {
-      httpOnly: true, // 🔥 can't access via JS
-      secure: false, // true in production (HTTPS)
+      httpOnly: true,
+      secure: false, // true in production
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.success("Login successful");
@@ -237,10 +260,10 @@ exports.logout = async (req, res) => {
       return res.error("No token found", 400);
     }
 
-    //  delete session from DB
+    // ✅ delete session from DB
     await Session.deleteOne({ token });
 
-    //  clear cookie
+    // ✅ clear cookie
     res.clearCookie("token", {
       httpOnly: true,
       sameSite: "strict",
