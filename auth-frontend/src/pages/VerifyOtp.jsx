@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import API from "../services/api";
 
 export default function VerifyOtp() {
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(localStorage.getItem("email") || "");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputsRef = useRef([]);
 
@@ -73,19 +74,23 @@ export default function VerifyOtp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-900 px-4">
       <div className="bg-yellow-200 w-full max-w-sm p-8 rounded-2xl shadow-xl">
-
         <h2 className="text-2xl font-bold text-center text-green-900 mb-6">
           Verify OTP
         </h2>
 
         <form onSubmit={handleVerify} className="flex flex-col gap-6">
-
           {/* Email */}
-          <input
+          {/* <input
             type="email"
             placeholder="Enter your email"
             className="w-full bg-transparent border-b-2 border-green-800 outline-none py-2 px-3 text-green-900"
             onChange={(e) => setEmail(e.target.value)}
+          /> */}
+          <input
+            type="email"
+            value={email}
+            readOnly
+            className="w-full bg-transparent border-b-2 border-green-800 outline-none py-2 px-3 text-green-900"
           />
 
           {/* OTP HEADING */}
@@ -130,7 +135,6 @@ export default function VerifyOtp() {
           <button className="bg-green-800 text-yellow-200 py-2 rounded-full mt-2 hover:bg-green-700 transition">
             Verify OTP
           </button>
-
         </form>
       </div>
     </div>
