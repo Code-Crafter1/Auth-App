@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../services/api";
 import { toast } from "react-toastify";
+import API from "../services/api";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -36,11 +36,6 @@ export default function Dashboard() {
     fetchProfile();
   }, [navigate]);
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   navigate("/login");
-  // };
-
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
 
@@ -54,12 +49,16 @@ export default function Dashboard() {
           },
         },
       );
-    } catch (err) {
-      console.log("Logout API failed");
-    }
 
-    localStorage.removeItem("token");
-    navigate("/login");
+      toast.success("Logged out successfully");
+
+      setTimeout(() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }, 1000); // 👈 delay
+    } catch (err) {
+      toast.error("Logout failed");
+    }
   };
 
   return (
