@@ -106,7 +106,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // const token = localStorage.getItem("token");
 
     if (!token) {
       navigate("/login");

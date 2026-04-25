@@ -102,27 +102,50 @@ exports.verifyOtp = async (req, res) => {
 
 //login
 
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
 
-    const emailLower = email.toLowerCase();
+//     const emailLower = email.toLowerCase();
 
-    const user = await User.findOne({ email: emailLower });
+//     const user = await User.findOne({ email: emailLower });
 
-    if (!user) return res.error("User not found", 400);
+//     if (!user) return res.error("User not found", 400);
 
-    if (!user.isVerified) return res.error("Verify email first", 400);
+//     if (!user.isVerified) return res.error("Verify email first", 400);
 
-    const isMatch = await bcrypt.compare(password, user.password);
+//     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) return res.error("Wrong password", 400);
+//     if (!isMatch) return res.error("Wrong password", 400);
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    //restrict multiple logins
-    await Session.deleteMany({ userId: user._id });
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: "7d",
+//     });
+//     //restrict multiple logins
+//     await Session.deleteMany({ userId: user._id });
+const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  expiresIn: "7d",
+});
+
+// ✅ delete old sessions
+await Session.deleteMany({ userId: user._id });
+
+// ✅ create new session
+await Session.create({
+  userId: user._id,
+  token,
+  expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+});
+
+// ✅ SET COOKIE
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: false, // true in production (HTTPS)
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
+res.success("Login successful");
 
     // ✅ create session
     await Session.create({
@@ -131,7 +154,15 @@ exports.login = async (req, res) => {
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    res.success("Login successful", { token });
+    // res.success("Login successful", { token });
+    res.cookie("token", token, {
+      httpOnly: true, // 🔥 can't access via JS
+      secure: false, // true in production (HTTPS)
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.success("Login successful");
   } catch (err) {
     res.error(err.message || "Server error", 500);
   }
@@ -185,11 +216,36 @@ exports.getProfile = async (req, res) => {
 
 // ✅ LOGOUT
 
+// exports.logout = async (req, res) => {
+//   try {
+//     const token = req.headers.authorization.split(" ")[1];
+
+//     await Session.deleteOne({ token });
+
+//     res.success("Logged out successfully");
+//   } catch (err) {
+//     res.error(err.message || "Server error", 500);
+//   }
+// };
+
 exports.logout = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
+    // ✅ get token from cookie
+    const token = req.cookies.token;
 
+    if (!token) {
+      return res.error("No token found", 400);
+    }
+
+    //  delete session from DB
     await Session.deleteOne({ token });
+
+    //  clear cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: false, // true in production
+    });
 
     res.success("Logged out successfully");
   } catch (err) {

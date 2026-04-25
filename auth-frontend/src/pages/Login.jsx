@@ -22,7 +22,7 @@ export default function Login() {
       // const res = await API.post("/login", form);
       const res = await loginUser(form);
 
-      localStorage.setItem("token", res.data.data.token);
+      // localStorage.setItem("token", res.data.data.token);
 
       toast.success(res.data.message);
 
