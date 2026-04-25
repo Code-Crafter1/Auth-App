@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Session = require("../models/Session");
 
 const sendEmail = require("../utils/sendEmail");
 const { generateOtp, getOtpExpiry } = require("../utils/otpService");
@@ -165,13 +166,39 @@ exports.verifyOtp = async (req, res) => {
 };
 
 // ✅ LOGIN
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.error("Email and password are required", 400);
+//     }
+
+//     const emailLower = email.toLowerCase();
+
+//     const user = await User.findOne({ email: emailLower });
+
+//     if (!user) return res.error("User not found", 400);
+
+//     if (!user.isVerified) return res.error("Verify email first", 400);
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+
+//     if (!isMatch) return res.error("Wrong password", 400);
+
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: "1d",
+//     });
+
+//     res.success("Login successful", { token });
+//   } catch (err) {
+//     res.error(err.message || "Server error", 500);
+//   }
+// };
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.error("Email and password are required", 400);
-    }
 
     const emailLower = email.toLowerCase();
 
@@ -186,7 +213,16 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.error("Wrong password", 400);
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "7d",
+    });
+    //restrict multiple logins
+    await Session.deleteMany({ userId: user._id });
+
+    // ✅ create session
+    await Session.create({
+      userId: user._id,
+      token,
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     res.success("Login successful", { token });
@@ -265,6 +301,20 @@ exports.getProfile = async (req, res) => {
     if (!user) return res.error("User not found", 404);
 
     res.success("Profile fetched", user);
+  } catch (err) {
+    res.error(err.message || "Server error", 500);
+  }
+};
+
+// ✅ LOGOUT
+
+exports.logout = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+
+    await Session.deleteOne({ token });
+
+    res.success("Logged out successfully");
   } catch (err) {
     res.error(err.message || "Server error", 500);
   }

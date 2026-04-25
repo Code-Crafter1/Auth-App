@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const navigate = useNavigate(); 
@@ -21,11 +22,11 @@ export default function Login() {
 
       localStorage.setItem("token", res.data.data.token);
 
-      alert(res.data.message);
+      toast.success(res.data.message);
 
       navigate("/dashboard"); 
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      toast.error(err.response?.data?.message || "Error");
     }
   };
 

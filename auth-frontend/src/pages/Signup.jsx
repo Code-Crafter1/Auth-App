@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export default function Signup() {
     try {
       const res = await API.post("/signup", form);
 
-      alert(res.data.message);
+      toast.success(res.data.message);
 
       // save email for OTP page (IMPORTANT)
       localStorage.setItem("email", form.email);
@@ -52,7 +53,7 @@ export default function Signup() {
         password: "",
       });
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      toast.error(err.response?.data?.message || "Error");
     }
   };
   return (

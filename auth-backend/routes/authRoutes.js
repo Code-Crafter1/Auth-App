@@ -10,6 +10,7 @@ router.post("/signup", auth.signup);
 router.post("/verify-otp", auth.verifyOtp);
 router.post("/login", auth.login);
 router.post("/resend-otp", auth.resendOtp);
+router.post("/logout", protect, auth.logout);
 
 // ✅ protected route (clean)
 router.get("/dashboard", protect, auth.getProfile);

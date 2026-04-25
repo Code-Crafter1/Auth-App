@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 export default function VerifyOtp() {
   // const [email, setEmail] = useState("");
@@ -52,10 +53,10 @@ export default function VerifyOtp() {
         otp: finalOtp,
       });
 
-      alert(res.data.message);
+      toast.success(res.data.message);
       window.location.href = "/login";
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      toast.error(err.response?.data?.message || "Error");
     }
   };
 
@@ -67,7 +68,7 @@ export default function VerifyOtp() {
       alert(res.data.message);
       setTimer(30); // reset timer
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      toast.error(err.response?.data?.message || "Error");
     }
   };
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -35,7 +36,28 @@ export default function Dashboard() {
     fetchProfile();
   }, [navigate]);
 
-  const handleLogout = () => {
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   navigate("/login");
+  // };
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      await API.post(
+        "/logout",
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        },
+      );
+    } catch (err) {
+      console.log("Logout API failed");
+    }
+
     localStorage.removeItem("token");
     navigate("/login");
   };
@@ -43,14 +65,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-900 px-4">
       <div className="bg-yellow-200 w-full max-w-md p-8 rounded-2xl shadow-xl text-center">
-
-        <h2 className="text-2xl font-bold text-green-900 mb-6">
-          Dashboard
-        </h2>
+        <h2 className="text-2xl font-bold text-green-900 mb-6">Dashboard</h2>
 
         {user ? (
           <div className="space-y-3 text-green-900">
-
             <p className="text-lg">
               👋 Welcome, <span className="font-semibold">{user.name}</span>
             </p>
@@ -63,7 +81,6 @@ export default function Dashboard() {
                 {user.isVerified ? "Verified ✅" : "Not Verified ❌"}
               </span>
             </p>
-
           </div>
         ) : (
           <p className="text-green-900">Loading...</p>
@@ -75,7 +92,6 @@ export default function Dashboard() {
         >
           Logout
         </button>
-
       </div>
     </div>
   );
