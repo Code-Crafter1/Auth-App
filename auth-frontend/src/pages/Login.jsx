@@ -24,7 +24,7 @@ export default function Login() {
 
       localStorage.setItem("token", res.data.data.token);
 
-      toast.success(res.data.message);
+      toast.info(res.data.message);
 
       navigate("/dashboard");
     } catch (err) {
