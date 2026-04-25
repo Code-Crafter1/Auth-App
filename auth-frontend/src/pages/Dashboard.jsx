@@ -96,6 +96,87 @@
 //   );
 // }
 
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { toast } from "react-toastify";
+// import { getProfile, logoutUser } from "../services/api";
+
+// export default function Dashboard() {
+//   const navigate = useNavigate();
+//   const [user, setUser] = useState(null);
+
+//   useEffect(() => {
+//     // const token = localStorage.getItem("token");
+
+//     if (!token) {
+//       navigate("/login");
+//       return;
+//     }
+
+//     const fetchProfile = async () => {
+//       try {
+//         const res = await getProfile();
+//         setUser(res.data.data);
+//       } catch (err) {
+//         console.log(err);
+//         localStorage.removeItem("token");
+//         navigate("/login");
+//       }
+//     };
+
+//     fetchProfile();
+//   }, [navigate]);
+
+//   const handleLogout = async () => {
+//     try {
+//       await logoutUser();
+
+//       toast.success("Logged out successfully");
+
+//       setTimeout(() => {
+//         localStorage.removeItem("token");
+//         navigate("/login");
+//       }, 1000);
+//     } catch (err) {
+//       toast.error("Logout failed");
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-green-900 px-4">
+//       <div className="bg-yellow-200 w-full max-w-md p-8 rounded-2xl shadow-xl text-center">
+//         <h2 className="text-2xl font-bold text-green-900 mb-6">Dashboard</h2>
+
+//         {user ? (
+//           <div className="space-y-3 text-green-900">
+//             <p className="text-lg">
+//               👋 Welcome, <span className="font-semibold">{user.name}</span>
+//             </p>
+
+//             <p>Email: {user.email}</p>
+
+//             <p>
+//               Status:{" "}
+//               <span className="font-semibold">
+//                 {user.isVerified ? "Verified ✅" : "Not Verified ❌"}
+//               </span>
+//             </p>
+//           </div>
+//         ) : (
+//           <p className="text-green-900">Loading...</p>
+//         )}
+
+//         <button
+//           onClick={handleLogout}
+//           className="mt-6 bg-green-800 text-yellow-200 py-2 px-6 rounded-full hover:bg-green-700 transition"
+//         >
+//           Logout
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -106,21 +187,13 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
     const fetchProfile = async () => {
       try {
         const res = await getProfile();
         setUser(res.data.data);
       } catch (err) {
         console.log(err);
-        localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/login"); // ✅ redirect if not authenticated
       }
     };
 
@@ -134,7 +207,6 @@ export default function Dashboard() {
       toast.success("Logged out successfully");
 
       setTimeout(() => {
-        localStorage.removeItem("token");
         navigate("/login");
       }, 1000);
     } catch (err) {
