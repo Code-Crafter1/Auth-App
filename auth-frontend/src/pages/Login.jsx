@@ -23,6 +23,7 @@ export default function Login() {
       const res = await loginUser(form);
 
       // localStorage.setItem("token", res.data.data.token);
+      document.cookie = `token=${res.data.data.token}; path=/; max-age=604800`;
 
       toast.success(res.data.message);
 
