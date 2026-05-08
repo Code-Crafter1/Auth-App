@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.json());
 // app.use(cors());
 corsOptions = {
-  origin: [process.env.FRONTEND_URL, "http://localhost:5173"], // Allow both production and development URLs
+  origin: [process.env.FRONTEND_URL, "https://auth-apx.netlify.app/"], // Allow both production and development URLs
   credentials: true, // Allow cookies to be sent
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],

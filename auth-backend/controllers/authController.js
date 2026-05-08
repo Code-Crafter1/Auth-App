@@ -162,33 +162,71 @@ exports.login = async (req, res) => {
 
     if (!isMatch) return res.error("Wrong password", 400);
 
-    // ✅ generate token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+  //   // ✅ generate token
+  //   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  //     expiresIn: "7d",
+  //   });
 
-    // ✅ delete old sessions
-    await Session.deleteMany({ userId: user._id });
+  //   // ✅ delete old sessions
+  //   await Session.deleteMany({ userId: user._id });
 
-    // ✅ create new session
-    await Session.create({
-      userId: user._id,
-      token,
-      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    });
+  //   // ✅ create new session
+  //   await Session.create({
+  //     userId: user._id,
+  //     token,
+  //     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+  //   });
 
-    // ✅ set cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // true in production
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+  //   // ✅ set cookie
+  //   // res.cookie("token", token, {
+  //   //   httpOnly: true,
+  //   //   secure: true, // true in production
+  //   //   sameSite: "none",
+  //   //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   // });
 
-    res.success("Login successful");
-  } catch (err) {
+  //   res.cookie("token", token, {
+  //     httpOnly: true,
+  //     secure: true, // 🔥 REQUIRED (Render = HTTPS)
+  //     sameSite: "none", // 🔥 REQUIRED (cross-site)
+  //     maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   });
+
+  //   res.success("Login successful");
+  // } catch (err) {
+  //   res.error(err.message || "Server error", 500);
+  // }
+
+  // create token
+const token = jwt.sign(
+  { id: user._id },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);
+
+// delete old sessions
+await Session.deleteMany({ userId: user._id });
+
+// create session
+await Session.create({
+  userId: user._id,
+  token,
+  expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+});
+
+// 🔥 SET COOKIE
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
+res.success("Login successful");
+} catch (err) {
     res.error(err.message || "Server error", 500);
   }
+
 };
 
 // ✅ RESEND OTP
